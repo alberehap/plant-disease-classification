@@ -1,55 +1,76 @@
-
 import os
-import random
-import csv
-from PIL import Image
-from pathlib import Path
+import cv2
+import numpy as np
+from sklearn.model_selection import train_test_split
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-random.seed(42)
+DATASET_PATH = "Dataset"    
+IMG_HEIGHT = 224
+IMG_WIDTH = 224
+X = []
+Y = []
+classes = os.listdir(DATASET_PATH)
 
-CLEAN_DIR = Path("data/cleaned")
-PROC_DIR = Path("data/processed")
-TARGET_SIZE = (224, 224)
-SPLIT = {"train": 0.7, "val": 0.2, "test": 0.1}
+print("Detected Classes:", classes)
 
-os.makedirs("logs", exist_ok=True)
+for label, folder in enumerate(classes):
+    folder_path = os.path.join(DATASET_PATH, folder)
+    
+    for file in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file)
+        try:
+            img = cv2.imread(file_path)
+            
+            # Skip corrupted images
+            if img is None:
+                print("Skipped corrupted image:", file_path)
+                continue
+            
+            # Resize
+            img = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
+            
+            X.append(img)
+            Y.append(label)
+        
+        except Exception as e:
+            print("Error loading image:", file_path, "Error:", e)
 
-# Create directories
-for split in SPLIT:
-    for cls in CLEAN_DIR.iterdir():
-        if cls.is_dir():
-            (PROC_DIR / split / cls.name).mkdir(parents=True, exist_ok=True)
+X = np.array(X)
+Y = np.array(Y)
 
-mapping_log = "logs/file_split_mapping.csv"
+print("Total Images Loaded:", len(X))
 
-with open(mapping_log, "w", newline="") as csvfile:
-    writer = csv.writer(csvfile)
-    writer.writerow(["src", "dst", "split", "class"])
+X = X / 255.0
+print("Images Normalized")
 
-    for cls in sorted(CLEAN_DIR.iterdir()):
-        if not cls.is_dir():
-            continue
+X_train, X_temp, Y_train, Y_temp = train_test_split(
+    X, Y, test_size=0.30, stratify=Y, random_state=42
+)
 
-        images = [p for p in cls.iterdir() if p.suffix.lower() in [".jpg", ".jpeg", ".png"]]
-        random.shuffle(images)
-        n = len(images)
+X_val, X_test, Y_val, Y_test = train_test_split(
+    X_temp, Y_temp, test_size=0.50, stratify=Y_temp, random_state=42
+)
 
-        n_train = int(n * SPLIT["train"])
-        n_val = int(n * SPLIT["val"])
+print("Train size:", len(X_train))
+print("Validation size:", len(X_val))
+print("Test size:", len(X_test))
 
-        assignments = (
-            ["train"] * n_train +
-            ["val"] * n_val +
-            ["test"] * (n - n_train - n_val)
-        )
+#  Data Augmentation (for training)
 
-        for img_file, split in zip(images, assignments):
-            dst = PROC_DIR / split / cls.name / img_file.name
-            with Image.open(img_file) as im:
-                im = im.convert("RGB")
-                im = im.resize(TARGET_SIZE, Image.Resampling.LANCZOS)
-                im.save(dst, format="JPEG", quality=95)
+train_datagen = ImageDataGenerator(
+    rotation_range=30,
+    zoom_range=0.2,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True
+)
 
-            writer.writerow([str(img_file), str(dst), split, cls.name])
+val_datagen = ImageDataGenerator()
+test_datagen = ImageDataGenerator()
 
-print("Preprocessing complete. Mapping saved:", mapping_log)
+train_generator = train_datagen.flow(X_train, Y_train, batch_size=32)
+val_generator = val_datagen.flow(X_val, Y_val, batch_size=32)
+test_generator = test_datagen.flow(X_test, Y_test, batch_size=32)
+
+print("Data preprocessing completed.")
