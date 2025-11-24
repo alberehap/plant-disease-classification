@@ -1,4 +1,4 @@
-\
+
 import os
 from PIL import Image, UnidentifiedImageError
 import hashlib
