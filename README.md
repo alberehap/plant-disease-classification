@@ -11,6 +11,7 @@ project
     
 2. How To Train The Model:
     -run efficientnetb3_training.ipynb
+    -model file google drive link: https://drive.google.com/drive/folders/1qYYAF7P7iAird46PBQJDsL0xplZIx96d
 
 3. Dependencies For Model Training:
     -TensorFlow, Keras, Matplotlib.
