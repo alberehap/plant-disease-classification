@@ -207,3 +207,4 @@ marimo/_lsp/
 __marimo__/
 "Models/**/*.keras" 
 "Models/**/*.keras" 
+*.keras
