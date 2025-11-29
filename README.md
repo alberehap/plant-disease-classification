@@ -166,3 +166,40 @@ model = keras.models.load_model('Models/MobileNetV2/plant_disease_mobilenet.kera
 6. My Role Description:
 
     -Implemented the MobileNetV2 model,Prepared the training pipeline,Trained and fine-tuned the model,Generated evaluation metrics and pushed all files/results to GitHub
+
+---------------------------------------------------------------
+Models Evaluation
+ 
+    evaluates and compares three deep learning architectures for plant disease classification: EfficientNetB3, ResNet50, and MobileNet.
+The evaluation includes quantitative metrics, qualitative analysis, and explainability results.
+1. Evaluation Metrics
+
+Each model was evaluated using the following metrics:
+
+Accuracy
+
+Precision
+
+Recall
+
+F1-Score
+
+Confusion Matrix
+
+Classification Report
+
+
+Model	Accuracy	Precision	Recall	F1-score
+0	EfficientNetB3	0.878049	0.900071	0.865741	0.852623
+1	ResNet50	0.695122	0.807359	0.711700	0.697907
+2	MobileNet	0.731707	0.707211	0.732435	0.684139
+
+Confusion Matrix Analysis
+
+Confusion matrices were generated for all three models to analyze:
+
+Correct vs. incorrect predictions
+
+Which classes are most frequently confused
+
+Whether additional data is needed for specific plant diseases
