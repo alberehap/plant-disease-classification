@@ -29,6 +29,103 @@ model = keras.models.load_model('Models/EfficientNetB3/plant_disease_model.keras
 
 6. My Role Description:
     -Implemented the ML model using EfficientNet, prepared the training pipeline, trained the model, generated evaluation metrics, and pushed the model files and results to GitHub.
+------------------------------------------------------------------------------------
+TROUBLESHOOTING: COMMITTING AFTER UPLOADING A LARGE FILE ISSUE FIX!
+
+# Git Troubleshooting: Resolving Large File Issues
+
+## Problem
+GitHub push was failing due to large files exceeding the 100MB limit:
+- `resnet50_final.h5` (206.85 MB)
+- `Models/resnet50_phase1_best.h5` (96.57 MB)
+- Various large DLL files from virtual environment
+
+## Solution Steps
+
+### 1. Identify Large Files
+```bash
+# Find files larger than 50MB
+Get-ChildItem -Recurse | Where-Object {$_.Length -gt 50MB} | Format-Table Name, @{Name="Size(MB)";Expression={[math]::Round($_.Length/1MB,2)}} -AutoSize
+```
+
+### 2. Remove Large Files from Git History
+```bash
+# Install git-filter-repo (modern replacement for filter-branch)
+pip install git-filter-repo
+
+# Remove all large files from Git history
+git filter-repo --path "resnet50_final.h5" --path "libclang.dll" --path "cv2.pyd" --path "_pywrap_tensorflow_common.dll" --path "*.h5" --path "*.keras" --path "*.pyd" --path "*.dll" --invert-paths
+
+# Remove remaining large model files
+git filter-repo --path "Models/resnet50_phase1_best.h5" --invert-paths
+```
+
+### 3. Reconnect Remote and Push
+```bash
+# Add remote origin (filter-repo removes remotes)
+git remote add origin https://github.com/alberehap/plant-disease-classification.git
+
+# Force push clean repository
+git push -u origin main --force
+```
+
+## Prevention for Future
+
+### Create Comprehensive .gitignore
+```
+# Large model files
+*.h5
+*.keras
+*.pkl
+*.pth
+Models/
+
+# Virtual environment
+venv/
+env/
+*.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Large binaries
+*.dll
+*.so
+*.exe
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+```
+
+### Best Practices
+1. **Never commit virtual environment files** - use `requirements.txt` instead
+2. **Use Git LFS for large model files** if they must be versioned
+3. **Add large file patterns to .gitignore** before committing
+4. **Check file sizes** before pushing with `Get-ChildItem` command
+
+## Key Tools Used
+- **git-filter-repo**: Modern tool for rewriting Git history
+- **Force push**: Required after history rewriting
+- **Comprehensive .gitignore**: Prevents future large file commits
+
+## Result
+-Repository successfully pushed to GitHub  
+-All large files removed from Git history  
+-Clean commit history preserved  
+-Proper .gitignore in place to prevent recurrence
+
+This process reduced the repository from ~900MB to ~40MB by removing large model files and virtual environment binaries.
+
+
+-----------------------------------------------------------------------
+
 
 
 # MobileNetV2
