@@ -203,3 +203,109 @@ Correct vs. incorrect predictions
 Which classes are most frequently confused
 
 Whether additional data is needed for specific plant diseases
+# ResNet50 – Plant Disease Classification  
+### Deep Learning Model Documentation
+
+---
+
+## 1. Model Overview
+
+ResNet50 is a 50-layer deep convolutional neural network that uses residual learning to overcome the vanishing gradient problem.  
+The model is widely used for image classification tasks, especially when fine-tuned on domain-specific datasets such as plant diseases.
+
+### Why ResNet50?
+- Excellent feature extraction capability  
+- Stable training behavior due to skip connections  
+- Performs well on medium-sized image datasets  
+- Strong transfer learning support via ImageNet pre-trained weights  
+
+Official Documentation:  
+https://keras.io/api/applications/resnet/
+
+---
+
+## 2. How to Train the Model
+
+Run the notebook:
+
+```
+Models/ResNet50/02_ResNet50_Training.ipynb
+```
+
+This notebook handles:
+- Dataset loading  
+- Preprocessing and normalization  
+- Phase 1 (feature extraction)  
+- Phase 2 (fine-tuning)  
+- Evaluation and saving the final model  
+
+Pre-trained model link (optional):
+*Add Google Drive link here*
+
+---
+
+## 3. Dependencies
+
+Install the following packages:
+
+```
+TensorFlow
+Keras
+NumPy
+Matplotlib
+```
+
+---
+
+## 4. Model Training Pipeline
+
+### Phase 1 — Feature Extraction
+- Freeze all ResNet50 layers  
+- Train only the newly added classifier head  
+- Fast convergence and stable training
+
+### Phase 2 — Fine-Tuning
+- Unfreeze the last 30 layers  
+- Reduce learning rate  
+- Allow the backbone to adapt to plant disease features  
+
+---
+
+## 5. Model Performance
+
+| Metric | Value |
+|--------|-------|
+| Training Accuracy | ~96–99% |
+| Validation Accuracy | ~98–99% |
+| Test Accuracy | ~97–99% |
+
+Notes:
+- Fine-tuning improved performance significantly  
+- Low validation loss indicates strong generalization  
+
+---
+
+## 6. Using the Pre-Trained Model
+
+```
+from tensorflow import keras
+model = keras.models.load_model("Models/ResNet50/resnet50_final.h5")
+```
+
+---
+
+## 7. My Role
+
+- Implemented the entire ResNet50 training pipeline  
+- Built and fine-tuned the model  
+- Prepared preprocessing and data generators  
+- Evaluated model performance and metrics  
+- Saved trained weights and uploaded all results to GitHub  
+
+---
+
+## 8. Summary
+
+ResNet50 is a highly reliable architecture for plant disease classification.  
+After fine-tuning, it achieved excellent performance and generalization.  
+It forms one of the main models in our evaluation, alongside EfficientNetB3 and MobileNetV2.
